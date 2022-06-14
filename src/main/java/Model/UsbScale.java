@@ -6,6 +6,8 @@ import javax.usb.*;
 import javax.usb.event.UsbPipeDataEvent;
 import javax.usb.event.UsbPipeErrorEvent;
 import javax.usb.event.UsbPipeListener;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -123,10 +125,15 @@ public class UsbScale implements UsbPipeListener {
             pipe.open();
         } catch (Exception e) {
             try {
-                FileWriter myWriter = new FileWriter("Scale_Weight.txt");
-                myWriter.write("Error! " + e.getMessage());
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write("Error! " + e.getMessage());
+                } finally {
+                    out.close();
+                }
             } catch (IOException exception) {
                 System.out.println("An error occurred.");
                 exception.printStackTrace();
@@ -141,10 +148,15 @@ public class UsbScale implements UsbPipeListener {
             return finalWeight;
         } catch (Exception e) {
             try {
-                FileWriter myWriter = new FileWriter("Scale_Weight.txt");
-                myWriter.write("Error! " + e.getMessage());
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write("Error! " + e.getMessage());
+                } finally {
+                    out.close();
+                }
             } catch (IOException exception) {
                 System.out.println("An error occurred.");
                 exception.printStackTrace();
@@ -162,10 +174,15 @@ public class UsbScale implements UsbPipeListener {
             LibUsb.exit(context);
         } catch (Exception e) {
             try {
-                FileWriter myWriter = new FileWriter("Scale_Weight.txt");
-                myWriter.write("Error! " + e.getMessage());
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write("Error! " + e.getMessage());
+                } finally {
+                    out.close();
+                }
             } catch (IOException exception) {
                 System.out.println("An error occurred.");
                 exception.printStackTrace();

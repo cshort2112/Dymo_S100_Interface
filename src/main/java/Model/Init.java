@@ -1,5 +1,6 @@
 package Model;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,20 +25,30 @@ public class Init {
             }
             weight = (double)Math.round(weight * 10d) / 10d;
             try {
-                FileWriter myWriter = new FileWriter("Scale_Weight.txt");
-                myWriter.write(String.valueOf(weight));
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write(String.valueOf(weight));
+                } finally {
+                    out.close();
+                }
             } catch (IOException e) {
                 System.out.println("An error occurred.");
                 e.printStackTrace();
             }
         } catch (Exception e) {
             try {
-                FileWriter myWriter = new FileWriter("Scale_Weight.txt");
-                myWriter.write("Error! " + e.getMessage());
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write("Error! " + e.getMessage());
+                } finally {
+                    out.close();
+                }
             } catch (IOException exception) {
                 System.out.println("An error occurred.");
                 exception.printStackTrace();
