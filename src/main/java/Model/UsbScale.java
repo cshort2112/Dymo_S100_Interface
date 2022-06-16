@@ -198,13 +198,26 @@ public class UsbScale implements UsbPipeListener {
                 int weight = (data[4] & 0xFF) + (data[5] << 8);
                 int scalingFactor = data[3];
                 finalWeight = scaleWeight(weight, scalingFactor); //final weight, applies to both metric and imperial
+            }else if (data[1] == 5) {
+                int weight = (data[4] & 0xFF) + (data[5] << 8);
+                int scalingFactor = data[3];
+                finalWeight = scaleWeight(weight, scalingFactor)*(-1); //final weight, applies to both metric and imperial
+            } else if (data[1] == 2) {
+                finalWeight = 0;
             }
         } else { //This would mean it is in metric
             if (data[1] == 4) {
                 int weight = (data[4] & 0xFF) + (data[5] << 8);
                 int scalingFactor = data[3];
                 finalWeight = (scaleWeight(weight, scalingFactor)*2.20462); //final weight, applies to both metric and imperial
+            } else if (data[1] == 5) {
+                int weight = (data[4] & 0xFF) + (data[5] << 8);
+                int scalingFactor = data[3];
+                finalWeight = (scaleWeight(weight, scalingFactor)*2.20462)*(-1); //final weight, applies to both metric and imperial
+            } else if (data[1] == 2) {
+                finalWeight = 0;
             }
+
         }
 
     }
@@ -217,5 +230,20 @@ public class UsbScale implements UsbPipeListener {
     @Override
     public void errorEventOccurred(UsbPipeErrorEvent usbPipeErrorEvent) {
         Logger.getLogger(UsbScale.class.getName()).log(Level.SEVERE, "Scale Error", usbPipeErrorEvent);
+        try {
+            String home = System.getProperty("user.home");
+            File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+
+            BufferedWriter out = new BufferedWriter(new FileWriter(f));
+            try {
+                out.write("Error! " + usbPipeErrorEvent);
+            } finally {
+                out.close();
+                System.exit(0);
+            }
+        } catch (IOException exception) {
+            System.out.println("An error occurred.");
+            exception.printStackTrace();
+        }
     }
 }
