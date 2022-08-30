@@ -45,7 +45,7 @@ public class Init {
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(f));
                 try {
-                    out.write("Error! " + e.getMessage());
+                    out.write("Error! Bleep " + e.getMessage());
                 } finally {
                     out.close();
                 }

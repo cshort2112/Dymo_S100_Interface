@@ -33,16 +33,21 @@ public class UsbScale implements UsbPipeListener {
             UsbServices services = UsbHostManager.getUsbServices();
             UsbHub rootHub = services.getRootUsbHub();
             // Dymo M10 Scale:
-            UsbDevice device = findDevice(rootHub, (short) 0x0922, (short) 0x8003);
-            // Dymo M25 Scale:
+            UsbDevice device = findDevice(rootHub, (short) 0x0922, (short) 0x8009);
+ //           // Dymo M25 Scale:
+ //           if (device == null) {
+ //               device = findDevice(rootHub, (short) 0x0922, (short) 0x8004);
+ //           }
             if (device == null) {
-                device = findDevice(rootHub, (short) 0x0922, (short) 0x8004);
-            }
-            // Dymo S100 Scale:
-            if (device == null) {
-                device = findDevice(rootHub, (short) 0x0922, (short) 0x8009);
-            }
-            if (device == null) {
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Desktop" + File.separator + "Error.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write("Error! " + rootHub);
+                } finally {
+                    out.close();
+                }
                 return null;
             }
             return new UsbScale(device);
