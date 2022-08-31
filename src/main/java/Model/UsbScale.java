@@ -32,31 +32,27 @@ public class UsbScale implements UsbPipeListener {
         try {
             UsbServices services = UsbHostManager.getUsbServices();
             UsbHub rootHub = services.getRootUsbHub();
-            // Dymo M10 Scale:
+            // Dymo S100 Scale:
             UsbDevice device = findDevice(rootHub, (short) 0x0922, (short) 0x8009);
  //           // Dymo M25 Scale:
  //           if (device == null) {
  //               device = findDevice(rootHub, (short) 0x0922, (short) 0x8004);
  //           }
             if (device == null) {
-                String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Desktop" + File.separator + "Error.txt");
-
-                BufferedWriter out = new BufferedWriter(new FileWriter(f));
-                try {
-                    out.write("Error! " + rootHub);
-                } finally {
-                    out.close();
-                }
                 return null;
             }
             return new UsbScale(device);
         } catch (Exception e) {
             try {
-                FileWriter myWriter = new FileWriter("Scale_Weight.txt");
-                myWriter.write("Error! " + e.getMessage());
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                String home = System.getProperty("user.home");
+                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(f));
+                try {
+                    out.write("Error! " + e.getMessage());
+                } finally {
+                    out.close();
+                }
             } catch (IOException exception) {
                 System.out.println("An error occurred.");
                 exception.printStackTrace();
@@ -131,7 +127,7 @@ public class UsbScale implements UsbPipeListener {
         } catch (Exception e) {
             try {
                 String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(f));
                 try {
@@ -154,7 +150,7 @@ public class UsbScale implements UsbPipeListener {
         } catch (Exception e) {
             try {
                 String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(f));
                 try {
@@ -180,7 +176,7 @@ public class UsbScale implements UsbPipeListener {
         } catch (Exception e) {
             try {
                 String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(f));
                 try {
@@ -237,7 +233,7 @@ public class UsbScale implements UsbPipeListener {
         Logger.getLogger(UsbScale.class.getName()).log(Level.SEVERE, "Scale Error", usbPipeErrorEvent);
         try {
             String home = System.getProperty("user.home");
-            File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+            File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
 
             BufferedWriter out = new BufferedWriter(new FileWriter(f));
             try {

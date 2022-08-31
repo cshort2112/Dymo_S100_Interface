@@ -26,7 +26,7 @@ public class Init {
             weight = (double)Math.round(weight * 10d) / 10d;
             try {
                 String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(f));
                 try {
@@ -41,11 +41,11 @@ public class Init {
         } catch (Exception e) {
             try {
                 String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Desktop" + File.separator + "Java.txt");
+                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(f));
                 try {
-                    out.write("Error! Bleep " + e.getMessage());
+                    out.write("Error! " + e.getMessage());
                 } finally {
                     out.close();
                 }
