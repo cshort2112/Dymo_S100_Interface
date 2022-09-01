@@ -73,7 +73,7 @@
                             <transformers>
                                 <transformer implementation=
                                                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>Model.Init</mainClass>
+                                    <mainClass>Model.Interface</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

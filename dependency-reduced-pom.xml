@@ -30,7 +30,7 @@
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <transformers>
                 <transformer>
-                  <mainClass>Model.Init</mainClass>
+                  <mainClass>Model.Interface</mainClass>
                 </transformer>
               </transformers>
             </configuration>

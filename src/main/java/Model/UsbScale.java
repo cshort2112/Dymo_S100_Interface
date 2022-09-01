@@ -6,16 +6,11 @@ import javax.usb.*;
 import javax.usb.event.UsbPipeDataEvent;
 import javax.usb.event.UsbPipeErrorEvent;
 import javax.usb.event.UsbPipeListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class UsbScale implements UsbPipeListener {
+public class UsbScale implements UsbPipeListener, AutoCloseable {
 
+    private boolean isOpened = false;
     private final UsbDevice device;
     private UsbInterface iface;
     private UsbPipe pipe;
@@ -29,36 +24,25 @@ public class UsbScale implements UsbPipeListener {
 
 
     public static UsbScale findScale() {
+        UsbServices services;
+        UsbHub rootHub = null;
         try {
-            UsbServices services = UsbHostManager.getUsbServices();
-            UsbHub rootHub = services.getRootUsbHub();
-            // Dymo S100 Scale:
-            UsbDevice device = findDevice(rootHub, (short) 0x0922, (short) 0x8009);
- //           // Dymo M25 Scale:
- //           if (device == null) {
- //               device = findDevice(rootHub, (short) 0x0922, (short) 0x8004);
- //           }
-            if (device == null) {
-                return null;
-            }
-            return new UsbScale(device);
-        } catch (Exception e) {
-            try {
-                String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
-
-                BufferedWriter out = new BufferedWriter(new FileWriter(f));
-                try {
-                    out.write("Error! " + e.getMessage());
-                } finally {
-                    out.close();
-                }
-            } catch (IOException exception) {
-                System.out.println("An error occurred.");
-                exception.printStackTrace();
-            }
+            services = UsbHostManager.getUsbServices();
+            rootHub = services.getRootUsbHub();
+        } catch (UsbException e) {
+            Interface.create_Error("Error! " + e.getMessage());
+        }
+        // Dymo S100 Scale:
+        assert rootHub != null;
+        UsbDevice device = findDevice(rootHub, (short) 0x0922, (short) 0x8009);
+        // Dymo M25 Scale:
+        //if (device == null) {
+        //    device = findDevice(rootHub, (short) 0x0922, (short) 0x8004);
+        //}
+        if (device == null) {
             return null;
         }
+        return new UsbScale(device);
     }
 
     private static UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
@@ -110,6 +94,7 @@ public class UsbScale implements UsbPipeListener {
 
     public void open()  {
         try {
+            isOpened = true;
             context = new Context();
             UsbConfiguration configuration = device.getActiveUsbConfiguration();
             iface = configuration.getUsbInterface((byte) 0);
@@ -124,101 +109,62 @@ public class UsbScale implements UsbPipeListener {
             pipe = endpoints.get(0).getUsbPipe(); // there is only 1 endpoint
             pipe.addUsbPipeListener(this);
             pipe.open();
-        } catch (Exception e) {
-            try {
-                String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
-
-                BufferedWriter out = new BufferedWriter(new FileWriter(f));
-                try {
-                    out.write("Error! " + e.getMessage());
-                } finally {
-                    out.close();
-                }
-            } catch (IOException exception) {
-                System.out.println("An error occurred.");
-                exception.printStackTrace();
-            }
+        }catch (UsbException e) {
+            Interface.create_Error("Error! "+ e.getMessage());
         }
 
+
+    }
+
+    public void close() {
+        if (!isOpened) return;
+        try {
+            pipe.close();
+            iface.release();
+            LibUsb.exit(context);
+        } catch (UsbException e) {
+            Interface.create_Error("Error! "+ e.getMessage());
+        }
     }
 
     public double syncSubmit() {
         try {
             pipe.syncSubmit(data);
-            return finalWeight;
-        } catch (Exception e) {
-            try {
-                String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
-
-                BufferedWriter out = new BufferedWriter(new FileWriter(f));
-                try {
-                    out.write("Error! " + e.getMessage());
-                } finally {
-                    out.close();
-                }
-            } catch (IOException exception) {
-                System.out.println("An error occurred.");
-                exception.printStackTrace();
-            }
-            return finalWeight;
+        } catch (UsbException e) {
+            Interface.create_Error("Error! "+ e.getMessage());
         }
-
+        return finalWeight;
     }
 
-
-    public void close() throws UsbException {
-        try {
-            pipe.close();
-            iface.release();
-            LibUsb.exit(context);
-        } catch (Exception e) {
-            try {
-                String home = System.getProperty("user.home");
-                File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
-
-                BufferedWriter out = new BufferedWriter(new FileWriter(f));
-                try {
-                    out.write("Error! " + e.getMessage());
-                } finally {
-                    out.close();
-                }
-            } catch (IOException exception) {
-                System.out.println("An error occurred.");
-                exception.printStackTrace();
-            }
-        }
-
-    }
 
     @Override
     public void dataEventOccurred(UsbPipeDataEvent upde) {
+        //System.out.println(data[1] + ", " + data[2] + ", " + data[3] + ", " + data[4] + ", " + data[5]);
+        //if data[1] == 4 value is stable, if data[1] == 3 value is unstable, if data[1] == 5 value is negative, if data[1] == 2 value is 0
         if (data[2] == 12) { //This means it is in imperial Mode
-            if (data[1] == 4) {
+            if (data[1] == 4 || data[1]== 3) {
                 int weight = (data[4] & 0xFF) + (data[5] << 8);
                 int scalingFactor = data[3];
                 finalWeight = scaleWeight(weight, scalingFactor); //final weight, applies to both metric and imperial
-            }else if (data[1] == 5) {
+            } else if (data[1] == 5) {
                 int weight = (data[4] & 0xFF) + (data[5] << 8);
                 int scalingFactor = data[3];
-                finalWeight = scaleWeight(weight, scalingFactor)*(-1); //final weight, applies to both metric and imperial
+                finalWeight = scaleWeight(weight, scalingFactor) * (-1); //final weight, applies to both metric and imperial
             } else if (data[1] == 2) {
                 finalWeight = 0;
             }
         } else { //This would mean it is in metric
-            if (data[1] == 4) {
+            if (data[1] == 4 || data[1]== 3) {
                 int weight = (data[4] & 0xFF) + (data[5] << 8);
                 int scalingFactor = data[3];
-                finalWeight = (scaleWeight(weight, scalingFactor)*2.20462); //final weight, applies to both metric and imperial
+                finalWeight = (scaleWeight(weight, scalingFactor) * 2.20462); //final weight, applies to both metric and imperial
             } else if (data[1] == 5) {
                 int weight = (data[4] & 0xFF) + (data[5] << 8);
                 int scalingFactor = data[3];
-                finalWeight = (scaleWeight(weight, scalingFactor)*2.20462)*(-1); //final weight, applies to both metric and imperial
+                finalWeight = (scaleWeight(weight, scalingFactor) * 2.20462) * (-1); //final weight, applies to both metric and imperial
             } else if (data[1] == 2) {
                 finalWeight = 0;
             }
-
         }
 
     }
@@ -230,21 +176,6 @@ public class UsbScale implements UsbPipeListener {
 
     @Override
     public void errorEventOccurred(UsbPipeErrorEvent usbPipeErrorEvent) {
-        Logger.getLogger(UsbScale.class.getName()).log(Level.SEVERE, "Scale Error", usbPipeErrorEvent);
-        try {
-            String home = System.getProperty("user.home");
-            File f = new File(home + File.separator + "Documents" + File.separator + "Weight.txt");
-
-            BufferedWriter out = new BufferedWriter(new FileWriter(f));
-            try {
-                out.write("Error! " + usbPipeErrorEvent);
-            } finally {
-                out.close();
-                System.exit(0);
-            }
-        } catch (IOException exception) {
-            System.out.println("An error occurred.");
-            exception.printStackTrace();
-        }
+        Interface.create_Error(usbPipeErrorEvent.toString());
     }
 }

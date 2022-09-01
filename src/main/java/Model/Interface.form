@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Model.Interface">
+  <grid id="27dc6" binding="main_Panel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="ecca5" class="javax.swing.JLabel" binding="label_Current_Weight">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Droid Serif" size="36" style="1"/>
+          <text value="Current Weight:"/>
+        </properties>
+      </component>
+      <component id="d9969" class="javax.swing.JLabel" binding="display_Current_Weight">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <background color="-13487309"/>
+          <font name="Droid Serif" size="48" style="1"/>
+          <text value="0.0"/>
+        </properties>
+      </component>
+      <component id="d0bda" class="javax.swing.JButton" binding="cancel_Button">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <background color="-13487309"/>
+          <foreground color="-2097140"/>
+          <text value="Cancel"/>
+        </properties>
+      </component>
+      <component id="9a357" class="javax.swing.JButton" binding="confirm_Button">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-13474336"/>
+          <text value="Confirm"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
